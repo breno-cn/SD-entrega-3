@@ -4,7 +4,7 @@ import signal
 import grpc
 
 from Server_pb2_grpc import ServerServicer, ServerStub, add_ServerServicer_to_server
-from Server_pb2 import Request, Response
+from Server_pb2 import Request, Response, Void
 from Hashtable import Hashtable
 
 from concurrent import futures
@@ -47,7 +47,7 @@ def ping(address: str) -> bool:
 
 class Server(ServerServicer):
     
-    def __init__(self, n: int, host: str, m: int) -> None:
+    def __init__(self, n: int, host: str, m: int, port: int) -> None:
         super().__init__()
         self.n = n
         self.host = host
@@ -55,6 +55,8 @@ class Server(ServerServicer):
         self.m = m                      # ammount of bits used by the hash function, also determinate the max network size
         self.fingerTable = [0] * self.m
         self.maxNodes = (2 ** self.m) + 1
+        self.port = port
+        self.replicas = []              # TODO: receber o port dos outros servers do nó
 
     def getResponsibleNode(self, key: str):
         result = getHash(key) % self.maxNodes
@@ -77,6 +79,7 @@ class Server(ServerServicer):
     def ping(self, request, context):
         return Response()
 
+    # TODO: no ping, retornar o N, a posicao do server no anel lógico
     def calculateFingerTable(self):
         for i in range(self.m):
             self.fingerTable[i] = self.succ((self.n + (2 ** (i))) % self.maxNodes)
@@ -149,15 +152,42 @@ class Server(ServerServicer):
             stub = ServerStub(channel)
             return stub.delete(Request(key=key))
 
+    def replicateCreate(self, request, context):
+        key = request.key
+        value = request.value
+
+        self.hashtable.create(key, value)
+
+        return Void()
+
+    def replicateRead(self, request, context):
+        return Void()
+
+    def replicateUpdate(self, request, context):
+        key = request.key
+        value = request.value
+
+        self.hashtable.update(key, value)
+
+        return Void()
+
+    def replicateDelete(self, request, context):
+        key = request.key
+
+        self.hashtable.delete(key)
+
+        return Void()
+
 
 n = int(sys.argv[1])
 m = int(sys.argv[2])
-serverServicer = Server(n, 'localhost', m)
+port = int(sys.argv[3])
+serverServicer = Server(n, 'localhost', m, port)
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
 add_ServerServicer_to_server(serverServicer, server)
 
-server.add_insecure_port(f'[::]:{n}')
+server.add_insecure_port(f'[::]:{port}')
 server.start()
 
 server.wait_for_termination()

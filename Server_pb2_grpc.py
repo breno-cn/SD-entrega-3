@@ -39,6 +39,26 @@ class ServerStub(object):
                 request_serializer=Server__pb2.Request.SerializeToString,
                 response_deserializer=Server__pb2.Response.FromString,
                 )
+        self.replicateCreate = channel.unary_unary(
+                '/Server/replicateCreate',
+                request_serializer=Server__pb2.Request.SerializeToString,
+                response_deserializer=Server__pb2.Void.FromString,
+                )
+        self.replicateRead = channel.unary_unary(
+                '/Server/replicateRead',
+                request_serializer=Server__pb2.Request.SerializeToString,
+                response_deserializer=Server__pb2.Void.FromString,
+                )
+        self.replicateUpdate = channel.unary_unary(
+                '/Server/replicateUpdate',
+                request_serializer=Server__pb2.Request.SerializeToString,
+                response_deserializer=Server__pb2.Void.FromString,
+                )
+        self.replicateDelete = channel.unary_unary(
+                '/Server/replicateDelete',
+                request_serializer=Server__pb2.Request.SerializeToString,
+                response_deserializer=Server__pb2.Void.FromString,
+                )
 
 
 class ServerServicer(object):
@@ -74,6 +94,30 @@ class ServerServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def replicateCreate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def replicateRead(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def replicateUpdate(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def replicateDelete(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ServerServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -101,6 +145,26 @@ def add_ServerServicer_to_server(servicer, server):
                     servicer.ping,
                     request_deserializer=Server__pb2.Request.FromString,
                     response_serializer=Server__pb2.Response.SerializeToString,
+            ),
+            'replicateCreate': grpc.unary_unary_rpc_method_handler(
+                    servicer.replicateCreate,
+                    request_deserializer=Server__pb2.Request.FromString,
+                    response_serializer=Server__pb2.Void.SerializeToString,
+            ),
+            'replicateRead': grpc.unary_unary_rpc_method_handler(
+                    servicer.replicateRead,
+                    request_deserializer=Server__pb2.Request.FromString,
+                    response_serializer=Server__pb2.Void.SerializeToString,
+            ),
+            'replicateUpdate': grpc.unary_unary_rpc_method_handler(
+                    servicer.replicateUpdate,
+                    request_deserializer=Server__pb2.Request.FromString,
+                    response_serializer=Server__pb2.Void.SerializeToString,
+            ),
+            'replicateDelete': grpc.unary_unary_rpc_method_handler(
+                    servicer.replicateDelete,
+                    request_deserializer=Server__pb2.Request.FromString,
+                    response_serializer=Server__pb2.Void.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -194,5 +258,73 @@ class Server(object):
         return grpc.experimental.unary_unary(request, target, '/Server/ping',
             Server__pb2.Request.SerializeToString,
             Server__pb2.Response.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def replicateCreate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Server/replicateCreate',
+            Server__pb2.Request.SerializeToString,
+            Server__pb2.Void.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def replicateRead(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Server/replicateRead',
+            Server__pb2.Request.SerializeToString,
+            Server__pb2.Void.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def replicateUpdate(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Server/replicateUpdate',
+            Server__pb2.Request.SerializeToString,
+            Server__pb2.Void.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def replicateDelete(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/Server/replicateDelete',
+            Server__pb2.Request.SerializeToString,
+            Server__pb2.Void.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
