@@ -1,10 +1,11 @@
+from fcntl import F_SEAL_SEAL
 import sys
 import os
 import signal
 import grpc
 
 from Server_pb2_grpc import ServerServicer, ServerStub, add_ServerServicer_to_server
-from Server_pb2 import Request, Response, Void
+from Server_pb2 import Request, Response, Void, PingResponse
 from Hashtable import Hashtable
 
 from concurrent import futures
@@ -37,10 +38,10 @@ def ping(address: str) -> bool:
     try:
         channel = grpc.insecure_channel(address)
         stub = ServerStub(channel)
-        stub.ping(Request())
-        response = True
+        pingResponse = stub.ping(Request())
+        response = pingResponse.n
     except Exception as e:
-        response = False
+        response = F_SEAL_SEAL
     finally:
         channel.close()
         return response
@@ -56,7 +57,11 @@ class Server(ServerServicer):
         self.fingerTable = [0] * self.m
         self.maxNodes = (2 ** self.m) + 1
         self.port = port
-        self.replicas = []              # TODO: receber o port dos outros servers do nó
+        self.replicas = sys.argv[4:]              # TODO: receber o port dos outros servers do nó
+
+        print(f'replicas of {self.port}: {self.replicas}')
+        print(f'M: {self.m}')
+        print(f'maxNodes: {self.maxNodes}')
 
     def getResponsibleNode(self, key: str):
         result = getHash(key) % self.maxNodes
@@ -72,19 +77,20 @@ class Server(ServerServicer):
     def succ(self, addr: int):
         currentAddr = addr + 1
         while True:
-            if ping(f'localhost:{currentAddr}'):
+            response = ping(f'localhost:{currentAddr}')
+            if response != False and response != self.n:
                 return currentAddr
             currentAddr = (currentAddr + 1) % self.maxNodes
 
     def ping(self, request, context):
-        return Response()
+        return PingResponse(self.n)
 
     # TODO: no ping, retornar o N, a posicao do server no anel lógico
     def calculateFingerTable(self):
         for i in range(self.m):
             self.fingerTable[i] = self.succ((self.n + (2 ** (i))) % self.maxNodes)
 
-        print(f'process {self.n} finger table: {self.fingerTable}')
+        print(f'process {self.port} finger table: {self.fingerTable}')
 
     def create(self, request, context):
         key = request.key
@@ -96,6 +102,13 @@ class Server(ServerServicer):
 
         if node == self.n:
             print(key, value, sep='\t')
+
+            # Replica a operação nos outros servidores do nó
+            for replica in self.replicas:
+                with grpc.insecure_channel(f'localhost:{replica}') as channel:
+                    stub = ServerStub(channel)
+                    stub.replicateCreate(request)
+
             status = self.hashtable.create(key, value)
             return Response(status=status)
 

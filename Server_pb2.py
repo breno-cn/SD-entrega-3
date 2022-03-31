@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0cServer.proto\"%\n\x07Request\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\")\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x06\n\x04Void2\xad\x02\n\x06Server\x12\x1d\n\x06\x63reate\x12\x08.Request\x1a\t.Response\x12\x1b\n\x04read\x12\x08.Request\x1a\t.Response\x12\x1d\n\x06update\x12\x08.Request\x1a\t.Response\x12\x1d\n\x06\x64\x65lete\x12\x08.Request\x1a\t.Response\x12\x1b\n\x04ping\x12\x08.Request\x1a\t.Response\x12\"\n\x0freplicateCreate\x12\x08.Request\x1a\x05.Void\x12 \n\rreplicateRead\x12\x08.Request\x1a\x05.Void\x12\"\n\x0freplicateUpdate\x12\x08.Request\x1a\x05.Void\x12\"\n\x0freplicateDelete\x12\x08.Request\x1a\x05.Voidb\x06proto3'
+  serialized_pb=b'\n\x0cServer.proto\"%\n\x07Request\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\")\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x06\n\x04Void\"\x19\n\x0cPingResponse\x12\t\n\x01n\x18\x01 \x01(\x05\x32\xb1\x02\n\x06Server\x12\x1d\n\x06\x63reate\x12\x08.Request\x1a\t.Response\x12\x1b\n\x04read\x12\x08.Request\x1a\t.Response\x12\x1d\n\x06update\x12\x08.Request\x1a\t.Response\x12\x1d\n\x06\x64\x65lete\x12\x08.Request\x1a\t.Response\x12\x1f\n\x04ping\x12\x08.Request\x1a\r.PingResponse\x12\"\n\x0freplicateCreate\x12\x08.Request\x1a\x05.Void\x12 \n\rreplicateRead\x12\x08.Request\x1a\x05.Void\x12\"\n\x0freplicateUpdate\x12\x08.Request\x1a\x05.Void\x12\"\n\x0freplicateDelete\x12\x08.Request\x1a\x05.Voidb\x06proto3'
 )
 
 
@@ -127,9 +127,42 @@ _VOID = _descriptor.Descriptor(
   serialized_end=104,
 )
 
+
+_PINGRESPONSE = _descriptor.Descriptor(
+  name='PingResponse',
+  full_name='PingResponse',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='n', full_name='PingResponse.n', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=106,
+  serialized_end=131,
+)
+
 DESCRIPTOR.message_types_by_name['Request'] = _REQUEST
 DESCRIPTOR.message_types_by_name['Response'] = _RESPONSE
 DESCRIPTOR.message_types_by_name['Void'] = _VOID
+DESCRIPTOR.message_types_by_name['PingResponse'] = _PINGRESPONSE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 Request = _reflection.GeneratedProtocolMessageType('Request', (_message.Message,), {
@@ -153,6 +186,13 @@ Void = _reflection.GeneratedProtocolMessageType('Void', (_message.Message,), {
   })
 _sym_db.RegisterMessage(Void)
 
+PingResponse = _reflection.GeneratedProtocolMessageType('PingResponse', (_message.Message,), {
+  'DESCRIPTOR' : _PINGRESPONSE,
+  '__module__' : 'Server_pb2'
+  # @@protoc_insertion_point(class_scope:PingResponse)
+  })
+_sym_db.RegisterMessage(PingResponse)
+
 
 
 _SERVER = _descriptor.ServiceDescriptor(
@@ -162,8 +202,8 @@ _SERVER = _descriptor.ServiceDescriptor(
   index=0,
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_start=107,
-  serialized_end=408,
+  serialized_start=134,
+  serialized_end=439,
   methods=[
   _descriptor.MethodDescriptor(
     name='create',
@@ -211,7 +251,7 @@ _SERVER = _descriptor.ServiceDescriptor(
     index=4,
     containing_service=None,
     input_type=_REQUEST,
-    output_type=_RESPONSE,
+    output_type=_PINGRESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),
