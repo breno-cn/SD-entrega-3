@@ -142,6 +142,11 @@ class Server(ServerServicer):
         print(f'responsible node: {node}')
 
         if node == self.n:
+            for replica in self.replicas:
+                with grpc.insecure_channel(f'localhost:{replica}') as channel:
+                    stub = ServerStub(channel)
+                    stub.replicateUpdate(request)
+
             print(key, value, sep='\t')
             status = self.hashtable.update(key, value)
             return Response(status=status, value=value)
@@ -158,6 +163,11 @@ class Server(ServerServicer):
         print(f'responsible node: {node}')
 
         if node == self.n:
+            for replica in self.replicas:
+                with grpc.insecure_channel(f'localhost:{replica}') as channel:
+                    stub = ServerStub(channel)
+                    stub.replicateDelete(request)
+
             status = self.hashtable.delete(key)
             return Response(status=status)
 
