@@ -10,10 +10,22 @@ message Response {
     string value = 2;
 }
 
+message Void {}
+
+message PingResponse {
+    int32 n = 1;
+}
+
 service Server {
     rpc create (Request) returns (Response);
     rpc read (Request) returns (Response);
     rpc update (Request) returns (Response);
     rpc delete (Request) returns (Response);
+
     rpc ping (Request) returns (Response);
+
+    rpc replicateCreate (Request) returns (Void);
+    rpc replicateRead (Request) returns (Void);
+    rpc replicateUpdate (Request) returns (Void);
+    rpc replicateDelete (Request) returns (Void);
 }

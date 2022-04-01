@@ -1,10 +1,11 @@
+from fcntl import F_SEAL_SEAL
 import sys
 import os
 import signal
 import grpc
 
 from Server_pb2_grpc import ServerServicer, ServerStub, add_ServerServicer_to_server
-from Server_pb2 import Request, Response
+from Server_pb2 import Request, Response, Void, PingResponse
 from Hashtable import Hashtable
 
 from concurrent import futures
@@ -37,7 +38,7 @@ def ping(address: str) -> bool:
     try:
         channel = grpc.insecure_channel(address)
         stub = ServerStub(channel)
-        stub.ping(Request())
+        stub.delete(Request())
         response = True
     except Exception as e:
         response = False
@@ -47,18 +48,24 @@ def ping(address: str) -> bool:
 
 class Server(ServerServicer):
     
-    def __init__(self, n: int, host: str, m: int) -> None:
+    def __init__(self, n: int, host: str, m: int, port: int) -> None:
         super().__init__()
         self.n = n
         self.host = host
         self.hashtable = Hashtable()
-        self.m = m                      # ammount of bits used by the hash function, also determinate the max network size
+        self.m = m                                      # ammount of bits used by the hash function, also determinate the max network size
         self.fingerTable = [0] * self.m
         self.maxNodes = (2 ** self.m) + 1
+        self.maxPorts = 300           
+        self.port = port
+        self.replicas = sys.argv[4:]
+
+        print(f'replicas of {self.port}: {self.replicas}')
+        print(f'M: {self.m}')
+        print(f'maxNodes: {self.maxNodes}')
 
     def getResponsibleNode(self, key: str):
         result = getHash(key) % self.maxNodes
-        print(result)
 
         for i in range(len(self.fingerTable)):
             if self.fingerTable[i] > result:
@@ -70,18 +77,19 @@ class Server(ServerServicer):
     def succ(self, addr: int):
         currentAddr = addr + 1
         while True:
-            if ping(f'localhost:{currentAddr}'):
+            response = ping(f'localhost:{currentAddr}')
+            if response != False:
                 return currentAddr
-            currentAddr = (currentAddr + 1) % self.maxNodes
+            currentAddr = (currentAddr + 1) % self.maxPorts
 
     def ping(self, request, context):
-        return Response()
+        return PingResponse(self.n)
 
     def calculateFingerTable(self):
         for i in range(self.m):
-            self.fingerTable[i] = self.succ((self.n + (2 ** (i))) % self.maxNodes)
+            self.fingerTable[i] = self.succ((self.port + (2 ** (i))) % self.maxPorts)
 
-        print(f'process {self.n} finger table: {self.fingerTable}')
+        print(f'process {self.port} finger table: {self.fingerTable}')
 
     def create(self, request, context):
         key = request.key
@@ -93,6 +101,12 @@ class Server(ServerServicer):
 
         if node == self.n:
             print(key, value, sep='\t')
+
+            for replica in self.replicas:
+                with grpc.insecure_channel(f'localhost:{replica}') as channel:
+                    stub = ServerStub(channel)
+                    stub.replicateCreate(request)
+
             status = self.hashtable.create(key, value)
             return Response(status=status)
 
@@ -126,6 +140,11 @@ class Server(ServerServicer):
         print(f'responsible node: {node}')
 
         if node == self.n:
+            for replica in self.replicas:
+                with grpc.insecure_channel(f'localhost:{replica}') as channel:
+                    stub = ServerStub(channel)
+                    stub.replicateUpdate(request)
+
             print(key, value, sep='\t')
             status = self.hashtable.update(key, value)
             return Response(status=status, value=value)
@@ -142,6 +161,11 @@ class Server(ServerServicer):
         print(f'responsible node: {node}')
 
         if node == self.n:
+            for replica in self.replicas:
+                with grpc.insecure_channel(f'localhost:{replica}') as channel:
+                    stub = ServerStub(channel)
+                    stub.replicateDelete(request)
+
             status = self.hashtable.delete(key)
             return Response(status=status)
 
@@ -149,15 +173,42 @@ class Server(ServerServicer):
             stub = ServerStub(channel)
             return stub.delete(Request(key=key))
 
+    def replicateCreate(self, request, context):
+        key = request.key
+        value = request.value
+
+        self.hashtable.create(key, value)
+
+        return Void()
+
+    def replicateRead(self, request, context):
+        return Void()
+
+    def replicateUpdate(self, request, context):
+        key = request.key
+        value = request.value
+
+        self.hashtable.update(key, value)
+
+        return Void()
+
+    def replicateDelete(self, request, context):
+        key = request.key
+
+        self.hashtable.delete(key)
+
+        return Void()
+
 
 n = int(sys.argv[1])
 m = int(sys.argv[2])
-serverServicer = Server(n, 'localhost', m)
+port = int(sys.argv[3])
+serverServicer = Server(n, 'localhost', m, port)
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
 add_ServerServicer_to_server(serverServicer, server)
 
-server.add_insecure_port(f'[::]:{n}')
+server.add_insecure_port(f'[::]:{port}')
 server.start()
 
 server.wait_for_termination()
