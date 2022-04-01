@@ -38,10 +38,10 @@ def ping(address: str) -> bool:
     try:
         channel = grpc.insecure_channel(address)
         stub = ServerStub(channel)
-        pingResponse = stub.ping(Request())
-        response = pingResponse.n
+        stub.delete(Request())
+        response = True
     except Exception as e:
-        response = F_SEAL_SEAL
+        response = False
     finally:
         channel.close()
         return response
@@ -53,11 +53,12 @@ class Server(ServerServicer):
         self.n = n
         self.host = host
         self.hashtable = Hashtable()
-        self.m = m                      # ammount of bits used by the hash function, also determinate the max network size
+        self.m = m                                      # ammount of bits used by the hash function, also determinate the max network size
         self.fingerTable = [0] * self.m
         self.maxNodes = (2 ** self.m) + 1
+        self.maxPorts = 300           
         self.port = port
-        self.replicas = sys.argv[4:]              # TODO: receber o port dos outros servers do nó
+        self.replicas = sys.argv[4:]
 
         print(f'replicas of {self.port}: {self.replicas}')
         print(f'M: {self.m}')
@@ -65,7 +66,6 @@ class Server(ServerServicer):
 
     def getResponsibleNode(self, key: str):
         result = getHash(key) % self.maxNodes
-        print(result)
 
         for i in range(len(self.fingerTable)):
             if self.fingerTable[i] > result:
@@ -78,17 +78,16 @@ class Server(ServerServicer):
         currentAddr = addr + 1
         while True:
             response = ping(f'localhost:{currentAddr}')
-            if response != False and response != self.n:
+            if response != False:
                 return currentAddr
-            currentAddr = (currentAddr + 1) % self.maxNodes
+            currentAddr = (currentAddr + 1) % self.maxPorts
 
     def ping(self, request, context):
         return PingResponse(self.n)
 
-    # TODO: no ping, retornar o N, a posicao do server no anel lógico
     def calculateFingerTable(self):
         for i in range(self.m):
-            self.fingerTable[i] = self.succ((self.n + (2 ** (i))) % self.maxNodes)
+            self.fingerTable[i] = self.succ((self.port + (2 ** (i))) % self.maxPorts)
 
         print(f'process {self.port} finger table: {self.fingerTable}')
 
@@ -103,7 +102,6 @@ class Server(ServerServicer):
         if node == self.n:
             print(key, value, sep='\t')
 
-            # Replica a operação nos outros servidores do nó
             for replica in self.replicas:
                 with grpc.insecure_channel(f'localhost:{replica}') as channel:
                     stub = ServerStub(channel)

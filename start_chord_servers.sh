@@ -14,7 +14,7 @@ WAIT_FOR_IT() {
 declare -A serverPids
 i=0
 spaw_node() {
-    MAX_PORT=99999
+    MAX_PORT=300
     node=$1
     bits=$2
 
@@ -71,6 +71,7 @@ WAIT_FOR_IT
 
 for j in $(seq 0 $i); do
     kill -SIGUSR1 ${serverPids[$j]}
+    #sleep 5
 done
 
 WAIT_FOR_IT

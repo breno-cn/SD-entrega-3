@@ -22,7 +22,7 @@ service Server {
     rpc update (Request) returns (Response);
     rpc delete (Request) returns (Response);
 
-    rpc ping (Request) returns (PingResponse);
+    rpc ping (Request) returns (Response);
 
     rpc replicateCreate (Request) returns (Void);
     rpc replicateRead (Request) returns (Void);

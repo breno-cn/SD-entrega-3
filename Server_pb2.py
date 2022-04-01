@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n\x0cServer.proto\"%\n\x07Request\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\")\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x06\n\x04Void\"\x19\n\x0cPingResponse\x12\t\n\x01n\x18\x01 \x01(\x05\x32\xb1\x02\n\x06Server\x12\x1d\n\x06\x63reate\x12\x08.Request\x1a\t.Response\x12\x1b\n\x04read\x12\x08.Request\x1a\t.Response\x12\x1d\n\x06update\x12\x08.Request\x1a\t.Response\x12\x1d\n\x06\x64\x65lete\x12\x08.Request\x1a\t.Response\x12\x1f\n\x04ping\x12\x08.Request\x1a\r.PingResponse\x12\"\n\x0freplicateCreate\x12\x08.Request\x1a\x05.Void\x12 \n\rreplicateRead\x12\x08.Request\x1a\x05.Void\x12\"\n\x0freplicateUpdate\x12\x08.Request\x1a\x05.Void\x12\"\n\x0freplicateDelete\x12\x08.Request\x1a\x05.Voidb\x06proto3'
+  serialized_pb=b'\n\x0cServer.proto\"%\n\x07Request\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\")\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\x05\x12\r\n\x05value\x18\x02 \x01(\t\"\x06\n\x04Void\"\x19\n\x0cPingResponse\x12\t\n\x01n\x18\x01 \x01(\x05\x32\xad\x02\n\x06Server\x12\x1d\n\x06\x63reate\x12\x08.Request\x1a\t.Response\x12\x1b\n\x04read\x12\x08.Request\x1a\t.Response\x12\x1d\n\x06update\x12\x08.Request\x1a\t.Response\x12\x1d\n\x06\x64\x65lete\x12\x08.Request\x1a\t.Response\x12\x1b\n\x04ping\x12\x08.Request\x1a\t.Response\x12\"\n\x0freplicateCreate\x12\x08.Request\x1a\x05.Void\x12 \n\rreplicateRead\x12\x08.Request\x1a\x05.Void\x12\"\n\x0freplicateUpdate\x12\x08.Request\x1a\x05.Void\x12\"\n\x0freplicateDelete\x12\x08.Request\x1a\x05.Voidb\x06proto3'
 )
 
 
@@ -203,7 +203,7 @@ _SERVER = _descriptor.ServiceDescriptor(
   serialized_options=None,
   create_key=_descriptor._internal_create_key,
   serialized_start=134,
-  serialized_end=439,
+  serialized_end=435,
   methods=[
   _descriptor.MethodDescriptor(
     name='create',
@@ -251,7 +251,7 @@ _SERVER = _descriptor.ServiceDescriptor(
     index=4,
     containing_service=None,
     input_type=_REQUEST,
-    output_type=_PINGRESPONSE,
+    output_type=_RESPONSE,
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
   ),

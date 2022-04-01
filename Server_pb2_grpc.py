@@ -37,7 +37,7 @@ class ServerStub(object):
         self.ping = channel.unary_unary(
                 '/Server/ping',
                 request_serializer=Server__pb2.Request.SerializeToString,
-                response_deserializer=Server__pb2.PingResponse.FromString,
+                response_deserializer=Server__pb2.Response.FromString,
                 )
         self.replicateCreate = channel.unary_unary(
                 '/Server/replicateCreate',
@@ -144,7 +144,7 @@ def add_ServerServicer_to_server(servicer, server):
             'ping': grpc.unary_unary_rpc_method_handler(
                     servicer.ping,
                     request_deserializer=Server__pb2.Request.FromString,
-                    response_serializer=Server__pb2.PingResponse.SerializeToString,
+                    response_serializer=Server__pb2.Response.SerializeToString,
             ),
             'replicateCreate': grpc.unary_unary_rpc_method_handler(
                     servicer.replicateCreate,
@@ -257,7 +257,7 @@ class Server(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/Server/ping',
             Server__pb2.Request.SerializeToString,
-            Server__pb2.PingResponse.FromString,
+            Server__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
